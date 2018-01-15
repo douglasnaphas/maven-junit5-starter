@@ -1,60 +1,87 @@
-# JUnit 5 Samples [![ci-badge]][ci-travis]
+# junit5-maven-consumer
 
-Welcome to _JUnit 5 Samples_, a collection of sample applications and extensions
-using JUnit Jupiter, JUnit Vintage, and the JUnit Platform on various build systems.
+The `junit5-maven-consumer` project demonstrates how to execute tests based on JUnit 5
+milestones using Maven. In addition, it showcases that existing JUnit 4 based tests can
+be executed in the same test suite as JUnit 5 based tests or any other tests supported on
+the JUnit Platform.
 
-CI builds for sample projects are available on [Jenkins][ci-jenkins] and
-[Travis CI][ci-travis].
+This sample project does not aim to demonstrate how to use the JUnit Jupiter APIs.
+For detailed  information on the JUnit Jupiter programming and extension models,
+please consult the [User Guide](http://junit.org/junit5/docs/current/user-guide/).
 
-## Vanilla Jupiter on Gradle ![badge-jdk-8] ![badge-tool-gradle] ![badge-junit-jupiter]
+Please note that this project uses the [Maven Wrapper](https://github.com/takari/maven-wrapper).
+Thus, to ensure that the correct version of Maven is used, invoke `mvnw` instead of `mvn`.
 
-The [junit5-vanilla-gradle] sample demonstrates the bare minimum configuration for
-getting started with JUnit Jupiter using the Gradle build system.
+## Executing JUnit 4 and JUnit Jupiter Tests
 
-## Vanilla Jupiter on Maven ![badge-jdk-8] ![badge-tool-maven] ![badge-junit-jupiter]
+Invoking `mvnw clean test` from the command line will execute all tests in the test source
+folder that follow one of following patterns: `Test*`, `*Test`, `*Tests`, or `*TestCase`.
+Note that [Surefire's default naming patterns](http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html)
+have been overridden in the `pom.xml` file. Surefire's execution of
+the sample tests should result in output similar to the following:
 
-The [junit5-vanilla-maven] sample demonstrates the bare minimum configuration for
-getting started with JUnit Jupiter using the Maven build system.
+```
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Jan 07, 2017 11:49:00 PM org.junit.platform.launcher.core.ServiceLoaderTestEngineRegistry loadTestEngines
+INFO: Discovered TestEngines with IDs: [junit-jupiter, junit-vintage]
+Running com.example.project.FirstTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.038 sec - in com.example.project.FirstTest
+Running com.example.project.JUnit4Test
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec - in com.example.project.JUnit4Test
+Running com.example.project.OtherTests
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec - in com.example.project.OtherTests
+Running com.example.project.SecondTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0.001 sec - in com.example.project.SecondTest
 
-## Gradle Consumer ![badge-jdk-8] ![badge-tool-gradle] ![badge-junit-platform] ![badge-junit-jupiter] ![badge-junit-vintage]
+Results :
 
-The [junit5-gradle-consumer] sample demonstrates how to set up a Gradle project
-using the JUnit Platform, JUnit Jupiter, and JUnit Vintage.
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 1
 
-## Maven Consumer ![badge-jdk-8] ![badge-tool-maven] ![badge-junit-platform] ![badge-junit-jupiter] ![badge-junit-vintage]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
 
-The [junit5-maven-consumer] sample demonstrates how to set up a Maven project
-using the JUnit Platform, JUnit Jupiter, and JUnit Vintage.
+If you comment out the `@Disabled` annotation on `SecondTest#mySecondTest()`, you will
+then see the build fail with output similar to the following:
 
-## Mockito Extension ![badge-jdk-8] ![badge-tool-gradle] ![badge-junit-platform] ![badge-junit-jupiter]
+```
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Jan 07, 2017 11:50:07 PM org.junit.platform.launcher.core.ServiceLoaderTestEngineRegistry loadTestEngines
+INFO: Discovered TestEngines with IDs: [junit-jupiter, junit-vintage]
+Running com.example.project.FirstTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 sec - in com.example.project.FirstTest
+Running com.example.project.JUnit4Test
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 sec - in com.example.project.JUnit4Test
+Running com.example.project.OtherTests
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 sec - in com.example.project.OtherTests
+Running com.example.project.SecondTest
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.032 sec <<< FAILURE! - in com.example.project.SecondTest
+mySecondTest()  Time elapsed: 0.019 sec  <<< FAILURE!
+org.opentest4j.AssertionFailedError: 2 is not equal to 1 ==> expected: <2> but was: <1>
+	at com.example.project.SecondTest.mySecondTest(SecondTest.java:24)
 
-The [junit5-mockito-extension] sample provides a simple extension that demonstrates
-how one can integrate Mockito into JUnit Jupiter tests.
 
-## Ice Cream Machine ![badge-jdk-9] ![badge-tool-gradle] ![badge-junit-platform]
+Results :
 
-The [junit5-java9-engine] sample demonstrates how to implement a custom
-[TestEngine][guide-custom-engine] for the JUnit Platform using the Java
-Platform Module System (a.k.a., _Project Jigsaw_ for Java 9).
+Failed tests:
+  SecondTest.mySecondTest:24 2 is not equal to 1 ==> expected: <2> but was: <1>
 
+Tests run: 5, Failures: 1, Errors: 0, Skipped: 0
 
-[junit5-gradle-consumer]: junit5-gradle-consumer
-[junit5-maven-consumer]: junit5-maven-consumer
-[junit5-vanilla-gradle]: junit5-vanilla-gradle
-[junit5-vanilla-maven]: junit5-vanilla-maven
-[junit5-mockito-extension]: junit5-mockito-extension
-[junit5-java9-engine]: junit5-java9-engine
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+```
 
-[badge-jdk-8]: https://img.shields.io/badge/jdk-8-yellow.svg "JDK-8"
-[badge-jdk-9]: https://img.shields.io/badge/jdk-9-orange.svg "JDK-9 or higher"
-[badge-tool-gradle]: https://img.shields.io/badge/tool-gradle-blue.svg "Gradle wrapper included"
-[badge-tool-maven]: https://img.shields.io/badge/tool-maven-0440af.svg "Maven wrapper included"
-[badge-junit-platform]: https://img.shields.io/badge/junit-platform-brightgreen.svg "JUnit Platform"
-[badge-junit-jupiter]: https://img.shields.io/badge/junit-jupiter-green.svg "JUnit Jupiter Engine"
-[badge-junit-vintage]: https://img.shields.io/badge/junit-vintage-yellowgreen.svg "JUnit Vintage Engine"
+### Test Reports
 
-[ci-badge]: https://travis-ci.org/junit-team/junit5-samples.svg "Travis CI build status"
-[ci-travis]: https://travis-ci.org/junit-team/junit5-samples
-[ci-jenkins]: https://junit.ci.cloudbees.com/blue/organizations/jenkins/JUnit%205%20Samples/branches/
+Maven Surefire writes plain text and XML test reports to `target/surefire-reports`.
 
-[guide-custom-engine]: http://junit.org/junit5/docs/current/user-guide/#launcher-api-engines-custom "Plugging in Your Own Test Engine"
+### Limitations
+
+Advanced Maven Surefire parameters, such as `forkCount` or `parallel`, do not work yet.
